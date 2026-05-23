@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
+    inputs:
+      target_date:
+        description: "Market data date for manual testing/backfill (YYYY-MM-DD). Leave blank for the normal daily run."
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -29,7 +34,14 @@ jobs:
         run: python -m pytest
 
       - name: Generate market brief
-        run: python scripts/generate_daily_brief.py
+        env:
+          TARGET_DATE: ${{ github.event.inputs.target_date || '' }}
+        run: |
+          if [ -n "$TARGET_DATE" ]; then
+            python scripts/generate_daily_brief.py --target-date "$TARGET_DATE"
+          else
+            python scripts/generate_daily_brief.py
+          fi
 
       - name: Commit report
         run: |

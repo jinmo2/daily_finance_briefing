@@ -61,6 +61,7 @@ def collect_market_observations(
     instruments: Sequence[Instrument] = DEFAULT_INSTRUMENTS,
     *,
     as_of: date | None = None,
+    end_date: date | None = None,
     lookback_days: int = 21,
     data_reader: DataReader | None = None,
 ) -> list[MarketObservation]:
@@ -71,8 +72,8 @@ def collect_market_observations(
 
     reader = data_reader or _load_finance_data_reader()
     report_date = as_of or today_kst()
-    end_date = report_date - timedelta(days=1)
-    start_date = end_date - timedelta(days=lookback_days)
+    query_end_date = end_date or (report_date - timedelta(days=1))
+    start_date = query_end_date - timedelta(days=lookback_days)
 
     observations: list[MarketObservation] = []
     for instrument in instruments:
@@ -81,7 +82,7 @@ def collect_market_observations(
                 instrument,
                 reader=reader,
                 start_date=start_date,
-                end_date=end_date,
+                end_date=query_end_date,
             )
         )
     return observations

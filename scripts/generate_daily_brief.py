@@ -19,10 +19,16 @@ from market_brief.report import build_report
 
 def main() -> int:
     args = parse_args()
-    generated_on = date.fromisoformat(args.as_of_date) if args.as_of_date else today_kst()
+    if args.target_date:
+        target_date = date.fromisoformat(args.target_date)
+        generated_on = target_date
+    else:
+        target_date = None
+        generated_on = date.fromisoformat(args.as_of_date) if args.as_of_date else today_kst()
 
     observations = collect_market_observations(
         as_of=generated_on,
+        end_date=target_date,
         lookback_days=args.lookback_days,
     )
     report = build_report(observations, generated_on=generated_on)
@@ -51,6 +57,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--as-of-date",
         help="KST report date in YYYY-MM-DD. Defaults to today's date in Asia/Seoul.",
+    )
+    parser.add_argument(
+        "--target-date",
+        help=(
+            "Market data date in YYYY-MM-DD for manual backfill/testing. "
+            "When set, the report is generated from data up to this date."
+        ),
     )
     parser.add_argument(
         "--lookback-days",

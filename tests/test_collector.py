@@ -33,6 +33,25 @@ def test_collect_market_observations_calculates_latest_change() -> None:
     assert calls == [("TEST", "2026-05-01", "2026-05-22")]
 
 
+def test_collect_market_observations_can_use_explicit_end_date() -> None:
+    frame = pd.DataFrame(
+        {"Close": [100.0, 105.0]},
+        index=pd.to_datetime(["2026-05-21", "2026-05-22"]),
+    )
+    calls = []
+
+    rows = collect_market_observations(
+        [INSTRUMENT],
+        as_of=date(2026, 5, 23),
+        end_date=date(2026, 5, 22),
+        data_reader=lambda symbol, start, end: calls.append((symbol, start, end)) or frame,
+    )
+
+    assert rows[0].status == "ok"
+    assert rows[0].observed_on == date(2026, 5, 22)
+    assert calls == [("TEST", "2026-05-01", "2026-05-22")]
+
+
 def test_collect_market_observations_handles_empty_data() -> None:
     frame = pd.DataFrame({"Close": []})
 
