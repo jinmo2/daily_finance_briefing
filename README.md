@@ -16,7 +16,7 @@ python scripts/generate_daily_brief.py
 
 ## GitHub Actions
 
-`.github/workflows/daily-brief.yml`은 매일 `00:00 UTC`에 실행됩니다. 한국시간 기준으로는 오전 09시입니다.
+`.github/workflows/daily-brief.yml`은 UTC 기준 일요일~목요일 `23:00`에 실행됩니다. 한국시간 기준으로는 월요일~금요일 오전 08시입니다.
 
 워크플로는 HTML을 생성한 뒤 변경된 `reports/` 파일을 저장소에 커밋합니다.
 
